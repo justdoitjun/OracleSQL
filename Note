@@ -1,0 +1,10 @@
+-- drop은 틀까지 날려버린다.
+-- group by 가 붙으면 그 group 안에서 경쟁한다.
+-- FROM -> Where -> Group by -> Having -> Select -> Order by
+-- 시험용으로는 구문 볼 때 Select랑 Order by는 일단 고려하지 말고 지워놓고 시작하면 큰 틀이 보인다.
+
+-- Order by 는 그 Order 가 Group by의 칼럼 명인 것이 원칙이고, 그것이 어렵다면 select의 칼럼명이어야함.
+-- 즉 뜬금없는 걸로 칼럼 정리하면 안된다.
+-- Order by에 집계함수가 칼럼으로 나올 수도 있는 예외가 있는데 이 때는 반드시 group by가 쓰여야한다.
+-- Order by (Case when id = 'a....) , AMT desc; 이런 구문도 가능하다. 이 경우엔 case 이하인 경우에만 정렬한다는 뜻
+-- Oracle은 null이 높게 나온다. null을 좋아하고 강조하는 듯.
