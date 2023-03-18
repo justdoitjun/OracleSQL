@@ -8,3 +8,19 @@
 -- Order by에 집계함수가 칼럼으로 나올 수도 있는 예외가 있는데 이 때는 반드시 group by가 쓰여야한다.
 -- Order by (Case when id = 'a....) , AMT desc; 이런 구문도 가능하다. 이 경우엔 case 이하인 경우에만 정렬한다는 뜻
 -- Oracle은 null이 높게 나온다. null을 좋아하고 강조하는 듯.
+
+-- (TRUNC) 소수점 n번째 자리까지만 살리고, 반올림이고 뭐고 그런 거 없이 뒷자리는 다 자르고 날려버림. turnc. 마치 도끼처럼.
+select trunc(3.467777, 2) from dual;   -- 3.46
+-- (ROUND) 소수점 n번째 자리에서 반올림. 2라고 되어있으면, 3번째 자리가 기준이 되어 결정함.
+select round(3.367777, 2) from dual;   -- 3.37
+-- 3이 아니라 7이 기준점이므로
+select round(3.337777, 2) from dual;   -- 3.34
+select round(3.363333, 2) from dual;   -- 3.36
+-- floor와 ceil은 소수점 같은 걸 따로 따지는 것이 아니라...그냥 trunc처럼 그냥 날려버린느 것임. 무조건.
+select floor(3.4677) from dual; -- 3
+select floor(3.9777) from dual; -- 3
+select ceil(3.277) from dual;  -- 4
+select ceil(3.977) from dual; -- 4
+
+-- NVL은 오라클에서만 쓰이는 구문임. ANSI에서는 ISNULL을 씀
+-- WHERE는 오라클 뿐만 아니라 ANSI에서도 쓰이는 표준문법임. 
