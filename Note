@@ -23,4 +23,12 @@ select ceil(3.277) from dual;  -- 4
 select ceil(3.977) from dual; -- 4
 
 -- NVL은 오라클에서만 쓰이는 구문임. ANSI에서는 ISNULL을 씀
--- WHERE는 오라클 뿐만 아니라 ANSI에서도 쓰이는 표준문법임. 
+-- WHERE는 오라클 뿐만 아니라 ANSI에서도 쓰이는 표준문법임.
+
+select coalesce('ab', 'cd') from dual; -- 'ab'
+select coalesce('ab', 'cd', 'ef') from dual; -- 'ab'
+select nullif('ab', 'cd') from dual; -- 'ab'
+select nullif('ab', 'ab') from dual; -- <null>
+select decode('ab', 'cd', 'ef') from dual;  -- <NULL>
+
+
