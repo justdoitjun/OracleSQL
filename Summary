@@ -84,3 +84,33 @@ SELECT sysdate                  -- 현재시간
     ,ADD_MONTHS(sysdate, 3)     -- 3개월 후
     ,ADD_MONTHS(sysdate, 3*4)   -- 1년  후
 FROM dual;
+
+SELECT ENAME,
+       ,EXTRACT(YEAR FROM HIREDATE) AS y
+       ,EXTRACT(month from HIREDATE) AS m
+       ,EXTRACT(day from HIREDATE) AS d
+FROM emp;
+
+SELECT sysdate,
+    round(sysdate,'cc') AS format_cc, -- 1세기를 당겨주세요. Century 2001-01-01 // 2500년이 안지나서..
+    round(sysdate, 'YYYY') AS format_yyyy, -- 2022년 초로 반올림해주세요. 2023-01-01 // 6월이 안 지나서..
+    round(sysdate, 'Q') AS format_q,    -- 분기를 반올림해주세요. Quarter 2023-04-01 //
+    round(sysdate, 'DDD') AS format_ddd, --
+    round(sysdate, 'HH') AS format_hh
+FROM dual;
+
+-- 문자열과 숫자가 비교가 어렵지.
+-- 근데, 만약에 14억 인도인 인구를 문자로 정리해 놓으면, 숫자로 치환하는데 너무 오랜 시간이 걸린다.
+-- 형변환은 명시적형변환(To~~로 시작하는 형변환)과 암묵적형변환이 있지만, 최대한 명시적 형변환을 사용하는 걸 선호한다.
+-- To_char
+-- 컴퓨터 계산을 위해서 서로 비교하기 위해 만든다....
+SELECT TO_NUMBER('3,300', '999,999'),
+       TO_NUMBER('1,100', '999,999')
+FROM DUAL;
+
+-- (8) =================================================
+-- NULL과 관련된 함수
+SELECT EMPNO, ENAME, COMM
+    ,NVL(COMM,0)
+    ,SAL+NVL(COMM,0)
+FROM EMP;
