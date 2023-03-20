@@ -1,4 +1,5 @@
--- <오라클 함수>     : Day3(3/20)
+
+-- <오라클 함수> -- DAY3(03/20)
 
 -- 문자열 함수
 -- (1) =================================================
@@ -38,7 +39,7 @@ FROM dual;
 -- (4) =================================================
 -- LPAD, RAPD : 문자열을 채워주는 함수   --> TRIM과 대척점에 있는 함수.
 -- 이 건 실무에서 왜 쓸까요? 칸을 채우기 위해 씁니다. 통일성을 유지하기 위해서.
--- 혹은 개인정보를 보호하기 위해서 이렇게 하는 경우도 있습니다. 
+-- 혹은 개인정보를 보호하기 위해서 이렇게 하는 경우도 있습니다.
 SELECT lpad('ORA_1234_XE', 20) AS lpad_20
     , rpad('ORA_1234_XE', 20) AS rapd_20
 FROM dual;
@@ -99,6 +100,24 @@ SELECT sysdate,
     round(sysdate, 'HH') AS format_hh
 FROM dual;
 
+-- (8) =================================================
+-- NULL과 관련된 함수
+-- NVL함수는 매우 중요합니다!!!!!
+-- NVL(입력값, NULL인 경우 대체할 값) 일치한다면, 이렇게 바꿀 거고 일치하지 않는다면 값 그대로 할 거야.
+-- NVL2(입력값, NULL인 경우 대체할 값) 일치하다면, 어떻게 일치하지 않는다면 어떻게 표기할지 정해줘.
+SELECT NVL(COMM,0),
+     NVL2(COMM,'Good', 'Bad')
+FROM EMP;
+
+
+SELECT EMPNO, ENAME, COMM
+    ,NVL(COMM,0)
+    ,SAL+NVL(COMM,0)
+FROM EMP;
+-- NULL값의 비교는 IS NULL <> IS NOT NULL
+
+-- (9) =================================================
+-- 형변환
 -- 문자열과 숫자가 비교가 어렵지.
 -- 근데, 만약에 14억 인도인 인구를 문자로 정리해 놓으면, 숫자로 치환하는데 너무 오랜 시간이 걸린다.
 -- 형변환은 명시적형변환(To~~로 시작하는 형변환)과 암묵적형변환이 있지만, 최대한 명시적 형변환을 사용하는 걸 선호한다.
@@ -107,10 +126,31 @@ FROM dual;
 SELECT TO_NUMBER('3,300', '999,999'),
        TO_NUMBER('1,100', '999,999')
 FROM DUAL;
+SELECT to_char(sysdate, 'YYYY/MM/DD HH24')
+FROM dual; -- 24시간 표기
+SELECT to_char(sysdate, 'DD HH24:MI:SS')
+FROM dual; -- 시분초까지 표기
+SELECT sysdate,
+       to_char(sysdate, 'MM') AS mml,
+       to_char(sysdate, 'mon', 'MLS_DATE_LANGUAGE = KOREAN') AS mm2
+FROM dual;
+SELECT sysdate,
+       to_char(sysdate, 'HH12:MI:SS' ) AS time
+FROM dual;
+SELECT to_number('1,000,000', '999,999,999') AS CURRENCY_TO_NUMBER
+FROM dual; -- 문자를 숫자로 바궈준다. 999,999,999가 의미하는 바는? 저 숫자크기를 넘어가면 error를 내겠다.
+-- 이 경우에는 일부러 error를 내는 경우로 1억이 넘는 경우는 error를 내겠다는 것이다.
+SELECT to_date('20230330', 'YYYY/MM/DD') AS ymd
+FROM dual;
 
--- (8) =================================================
--- NULL과 관련된 함수
-SELECT EMPNO, ENAME, COMM
-    ,NVL(COMM,0)
-    ,SAL+NVL(COMM,0)
-FROM EMP;
+-- TO_DATE(입력날짜, 'RR-MM-DD')
+-- TO_DATE(입력날짜, 'YY-MM-DD')
+-- 날짜 포멧 RR과 YY의 값을 비교하자.
+
+SELECT TO_DATE('49/12/10', 'YY/MM/DD') AS YY_491
+    ,TO_DATE('49/12/10', 'RR/MM/DD') AS RR_491
+    ,TO_DATE('50/12/19', 'YY/MM/DD') AS YY_492
+    ,TO_DATE('50/12/19', 'RR/MM/DD') AS RR_492
+    ,TO_DATE('51/12/19', 'YY/MM/DD') AS YY_493
+    ,TO_DATE('51/12/19', 'RR/MM/DD') AS RR_493
+FROM dual;
