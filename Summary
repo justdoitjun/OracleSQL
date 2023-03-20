@@ -1,5 +1,4 @@
-
--- <오라클 함수> -- DAY3(03/20)
+-- <오라클 함수> --DAY3(03/17/2023)
 
 -- 문자열 함수
 -- (1) =================================================
@@ -109,12 +108,12 @@ SELECT NVL(COMM,0),
      NVL2(COMM,'Good', 'Bad')
 FROM EMP;
 
-
 SELECT EMPNO, ENAME, COMM
     ,NVL(COMM,0)
     ,SAL+NVL(COMM,0)
 FROM EMP;
 -- NULL값의 비교는 IS NULL <> IS NOT NULL
+
 
 -- (9) =================================================
 -- 형변환
@@ -154,3 +153,24 @@ SELECT TO_DATE('49/12/10', 'YY/MM/DD') AS YY_491
     ,TO_DATE('51/12/19', 'YY/MM/DD') AS YY_493
     ,TO_DATE('51/12/19', 'RR/MM/DD') AS RR_493
 FROM dual;
+-- (10) =================================================
+-- DECODE CASE
+-- DECODE는 무조건 해당 숫자가 되어야하지만
+-- CASE는 유연하게 그 해당 범위에 있으면 처리해줄 수 있다.
+
+SELECT EMPNO, ENAME, JOB, SAL
+    ,DECODER(JOB,
+                    'MANAGER', SAL*0.2,
+                    'SALESMAN', SAL*0.3,
+                    'ANALYST', SAL*0.05,
+                    SAL*0.1) AS BONUS
+FROM EMP;
+
+SELECT EMPNO, ENAME, JOB, SAL
+    ,CASE JOB
+            WHEN 'MANAGER' THEN SAL*0.2
+            WHEN 'SALESMAN' THEN SAL*0.3
+            WHEN 'ANALYST' THEN SAL*0.05
+            ELSE SAL *0.1
+            END AS BONUS
+FROM EMP;
