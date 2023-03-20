@@ -1,0 +1,176 @@
+-- <오라클 함수> --DAY3(03/17/2023)
+
+-- 문자열 함수
+-- (1) =================================================
+-- UPPER() 대문자 변환
+-- LOWER() 소문자 변환
+-- LENGTH() 문자열 길이
+-- SAMPLE
+SELECT ENAME
+    , upper(ename) AS to_upper_name
+    , lower(ename) AS to_lower_name
+FROM EMP;
+-- 고객은 대문자 / 소문자를 구분하지 않는 경우가 많습니다. 따라서, 이를 대문자든 소문자로 통합해주는 것이 매우 중요합니다.
+-- 이는 뭔가 String 값을 비교하는 것도 마찬가지입니다. 아래의 사례처럼 말이죠. 이 개념은 원자성이라는 것과 연결됩니다.
+SELECT *
+FROM EMP
+WHERE upper(ename) = upper('Scott');
+-- 빈칸을 날리는 경우는 어떻게 할까요? TRIM  공란을 날려줘야할 필요도 있지요.
+-- (2) =================================================
+-- TRIM : 공란 제거
+SELECT trim(' ___ORACLE _ _ _ ')
+FROM dual;
+-- 위 처럼 하면 공란이 제거가 되긴 하지만, 하나밖에 사라지지 않습니다.
+-- 이 경우에는 공란도 정규 아스키코드가 있으므로 아스키 코드를 사용해보는 것도 팁입니다.
+-- CONCAT : 문자열 연결 (더하기)
+SELECT EMPNO    -- 7369
+        , ENAME -- SMITH
+        , concat(empno, ename) -- 이 경우에는 7369SMITH
+FROM EMP;
+-- (3) =================================================
+-- REPLACE : 문자열 교체
+-- 주요 예시 : 전화번호, 이메일, 집주소 등등
+-- 자료를 깔끔하게 정리해주거나 혹은 개인정보를 보호하려고 이렇게 합니다.
+SELECT '010-1234-5678' AS mobile_phone
+    , replace('010-1234-5678', '-', '') AS replaced_mobile_phone
+-- replace(1,2,3) 1번의 값 중 2번의 내용을 찾아서 3번처럼 바꿔주세요.
+FROM dual;
+-- (4) =================================================
+-- LPAD, RAPD : 문자열을 채워주는 함수   --> TRIM과 대척점에 있는 함수.
+-- 이 건 실무에서 왜 쓸까요? 칸을 채우기 위해 씁니다. 통일성을 유지하기 위해서.
+-- 혹은 개인정보를 보호하기 위해서 이렇게 하는 경우도 있습니다.
+SELECT lpad('ORA_1234_XE', 20) AS lpad_20
+    , rpad('ORA_1234_XE', 20) AS rapd_20
+FROM dual;
+SELECT lpad('ORA_1234_XE', 20, '*') AS lpad_20
+    , rpad('ORA_1234_XE', 20, '*') AS rapd_20
+FROM dual;
+-- (5) =================================================
+-- 이번 건은 4번에서 확장되는 코드입니다.
+
+-- (6) =================================================
+-- 숫자함수
+SELECT ROUND(1234.5678) AS R, ROUND(1234.5678, 0) AS R_0;
+SELECT ROUND(3.1428, 3) AS round0
+    , ROUND(3.1421, 3) AS ROUND1
+    , TRUNC(123.4567, 3) AS trunc0
+    , TRUNC(-123.4567, 3) AS trunc1
+FROM dual;
+SELECT CEIL(3.1) AS CEIL0 -- 부동소수가 일반적으로 들어갑니다. 정수가 있는 곳에 넣을 일은 없겠죠.
+    , CEIL(3.9) AS CEIL1
+    , FLOOR(3.1) AS CEIL0
+    , FLOOR(3.9) AS CEIL1
+FROM dual;
+-- CEIL과 FLOOR는 자리수와 상관이 없습니다.
+
+SELECT POWER(3,2), POWER(-3,3) FROM dual;
+SELECT ABS(-100), ABS(100), ABS(0) from dual;
+SELECT SIGN(-900), SIGN(700), SIGN(0) from dual;
+-- 나누기에 대한 나머지(REMAINDER) 나머지에 대한 몫(MOD)
+SELECT MOD(15,6), MOD(10,2), MOD(11,2) FROM dual;
+SELECT REMAINDER(15,4) AS R1   --  -1
+    , REMAINDER(15, -4) AS R2  --  -1
+    , REMAINDER(-11, 4) AS R3  --  +1
+    , REMAINDER(-11, -4) AS R4 --  +1
+    , MOD(15,4) AS M1          --  +3
+    , MOD(15,-4) AS M2         --  +3
+    , MOD(-11,4) AS M3         --  -3
+    , MOD(-11,-4) AS M4        --  -3
+FROM dual;
+-- (7) =================================================
+-- 날짜함수
+
+SELECT sysdate                  -- 현재시간
+    ,ADD_MONTHS(sysdate, 3)     -- 3개월 후
+    ,ADD_MONTHS(sysdate, 3*4)   -- 1년  후
+FROM dual;
+
+SELECT ENAME,
+       ,EXTRACT(YEAR FROM HIREDATE) AS y
+       ,EXTRACT(month from HIREDATE) AS m
+       ,EXTRACT(day from HIREDATE) AS d
+FROM emp;
+
+SELECT sysdate,
+    round(sysdate,'cc') AS format_cc, -- 1세기를 당겨주세요. Century 2001-01-01 // 2500년이 안지나서..
+    round(sysdate, 'YYYY') AS format_yyyy, -- 2022년 초로 반올림해주세요. 2023-01-01 // 6월이 안 지나서..
+    round(sysdate, 'Q') AS format_q,    -- 분기를 반올림해주세요. Quarter 2023-04-01 //
+    round(sysdate, 'DDD') AS format_ddd, --
+    round(sysdate, 'HH') AS format_hh
+FROM dual;
+
+-- (8) =================================================
+-- NULL과 관련된 함수
+-- NVL함수는 매우 중요합니다!!!!!
+-- NVL(입력값, NULL인 경우 대체할 값) 일치한다면, 이렇게 바꿀 거고 일치하지 않는다면 값 그대로 할 거야.
+-- NVL2(입력값, NULL인 경우 대체할 값) 일치하다면, 어떻게 일치하지 않는다면 어떻게 표기할지 정해줘.
+SELECT NVL(COMM,0),
+     NVL2(COMM,'Good', 'Bad')
+FROM EMP;
+
+SELECT EMPNO, ENAME, COMM
+    ,NVL(COMM,0)
+    ,SAL+NVL(COMM,0)
+FROM EMP;
+-- NULL값의 비교는 IS NULL <> IS NOT NULL
+
+
+-- (9) =================================================
+-- 형변환
+-- 문자열과 숫자가 비교가 어렵지.
+-- 근데, 만약에 14억 인도인 인구를 문자로 정리해 놓으면, 숫자로 치환하는데 너무 오랜 시간이 걸린다.
+-- 형변환은 명시적형변환(To~~로 시작하는 형변환)과 암묵적형변환이 있지만, 최대한 명시적 형변환을 사용하는 걸 선호한다.
+-- To_char
+-- 컴퓨터 계산을 위해서 서로 비교하기 위해 만든다....
+SELECT TO_NUMBER('3,300', '999,999'),
+       TO_NUMBER('1,100', '999,999')
+FROM DUAL;
+SELECT to_char(sysdate, 'YYYY/MM/DD HH24')
+FROM dual; -- 24시간 표기
+SELECT to_char(sysdate, 'DD HH24:MI:SS')
+FROM dual; -- 시분초까지 표기
+SELECT sysdate,
+       to_char(sysdate, 'MM') AS mml,
+       to_char(sysdate, 'mon', 'MLS_DATE_LANGUAGE = KOREAN') AS mm2
+FROM dual;
+SELECT sysdate,
+       to_char(sysdate, 'HH12:MI:SS' ) AS time
+FROM dual;
+SELECT to_number('1,000,000', '999,999,999') AS CURRENCY_TO_NUMBER
+FROM dual; -- 문자를 숫자로 바궈준다. 999,999,999가 의미하는 바는? 저 숫자크기를 넘어가면 error를 내겠다.
+-- 이 경우에는 일부러 error를 내는 경우로 1억이 넘는 경우는 error를 내겠다는 것이다.
+SELECT to_date('20230330', 'YYYY/MM/DD') AS ymd
+FROM dual;
+
+-- TO_DATE(입력날짜, 'RR-MM-DD')
+-- TO_DATE(입력날짜, 'YY-MM-DD')
+-- 날짜 포멧 RR과 YY의 값을 비교하자.
+
+SELECT TO_DATE('49/12/10', 'YY/MM/DD') AS YY_491
+    ,TO_DATE('49/12/10', 'RR/MM/DD') AS RR_491
+    ,TO_DATE('50/12/19', 'YY/MM/DD') AS YY_492
+    ,TO_DATE('50/12/19', 'RR/MM/DD') AS RR_492
+    ,TO_DATE('51/12/19', 'YY/MM/DD') AS YY_493
+    ,TO_DATE('51/12/19', 'RR/MM/DD') AS RR_493
+FROM dual;
+-- (10) =================================================
+-- DECODE CASE
+-- DECODE는 무조건 해당 숫자가 되어야하지만
+-- CASE는 유연하게 그 해당 범위에 있으면 처리해줄 수 있다.
+
+SELECT EMPNO, ENAME, JOB, SAL
+    ,DECODER(JOB,
+                    'MANAGER', SAL*0.2,
+                    'SALESMAN', SAL*0.3,
+                    'ANALYST', SAL*0.05,
+                    SAL*0.1) AS BONUS
+FROM EMP;
+
+SELECT EMPNO, ENAME, JOB, SAL
+    ,CASE JOB
+            WHEN 'MANAGER' THEN SAL*0.2
+            WHEN 'SALESMAN' THEN SAL*0.3
+            WHEN 'ANALYST' THEN SAL*0.05
+            ELSE SAL *0.1
+            END AS BONUS
+FROM EMP;
