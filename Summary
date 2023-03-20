@@ -45,3 +45,42 @@ FROM dual;
 SELECT lpad('ORA_1234_XE', 20, '*') AS lpad_20
     , rpad('ORA_1234_XE', 20, '*') AS rapd_20
 FROM dual;
+-- (5) =================================================
+-- 이번 건은 4번에서 확장되는 코드입니다.
+
+-- (6) =================================================
+-- 숫자함수
+SELECT ROUND(1234.5678) AS R, ROUND(1234.5678, 0) AS R_0;
+SELECT ROUND(3.1428, 3) AS round0
+    , ROUND(3.1421, 3) AS ROUND1
+    , TRUNC(123.4567, 3) AS trunc0
+    , TRUNC(-123.4567, 3) AS trunc1
+FROM dual;
+SELECT CEIL(3.1) AS CEIL0 -- 부동소수가 일반적으로 들어갑니다. 정수가 있는 곳에 넣을 일은 없겠죠.
+    , CEIL(3.9) AS CEIL1
+    , FLOOR(3.1) AS CEIL0
+    , FLOOR(3.9) AS CEIL1
+FROM dual;
+-- CEIL과 FLOOR는 자리수와 상관이 없습니다.
+
+SELECT POWER(3,2), POWER(-3,3) FROM dual;
+SELECT ABS(-100), ABS(100), ABS(0) from dual;
+SELECT SIGN(-900), SIGN(700), SIGN(0) from dual;
+-- 나누기에 대한 나머지(REMAINDER) 나머지에 대한 몫(MOD)
+SELECT MOD(15,6), MOD(10,2), MOD(11,2) FROM dual;
+SELECT REMAINDER(15,4) AS R1   --  -1
+    , REMAINDER(15, -4) AS R2  --  -1
+    , REMAINDER(-11, 4) AS R3  --  +1
+    , REMAINDER(-11, -4) AS R4 --  +1
+    , MOD(15,4) AS M1          --  +3
+    , MOD(15,-4) AS M2         --  +3
+    , MOD(-11,4) AS M3         --  -3
+    , MOD(-11,-4) AS M4        --  -3
+FROM dual;
+-- (7) =================================================
+-- 날짜함수
+
+SELECT sysdate                  -- 현재시간
+    ,ADD_MONTHS(sysdate, 3)     -- 3개월 후
+    ,ADD_MONTHS(sysdate, 3*4)   -- 1년  후
+FROM dual;
