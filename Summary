@@ -174,3 +174,195 @@ SELECT EMPNO, ENAME, JOB, SAL
             ELSE SAL *0.1
             END AS BONUS
 FROM EMP;
+
+--DAY 02 ===========================++=====================++=============================++===========================
+-- (11) =================================================
+-- 집계함수
+-- 합 /
+SELECT sum(E.sal) AS sum_of_sal
+    ,avg(e.sal) As avg_of_sal
+FROM EMP E
+;
+FROM dual;
+-- (12) =================================================
+-- 중요한 함수는 레코드 그룹별 집계입니다.
+-- Group by 라든지... 이 때 집계조건은 having입니다.
+-- 이 때 칼럼에 자주 쓰는 접두사는 distinct 입니다.
+SELECT DEPTNO
+    , count(SAL)
+    , avg(SAL)
+    , max(SAL)
+    , min(SAL)
+    , sum(SAL)
+FROM EMP
+GROUP BY DEPTNO
+ORDER BY deptno;
+
+SELECT *
+FROM EMP, DEPT
+GROUP BY EMPNO
+ORDER BY empno;
+
+
+SELECT DISTINCT DEPTNO
+FROM EMP E
+;
+SELECT DISTINCT e.DEPTNO
+    , e.SAL
+    , e.EMPNO
+FROM EMP e;
+
+SELECT SUM(DISTINCT SAL) AS SUM_DISTINCT_SAL
+    ,SUM(ALL SAL) AS SUM_ALL_SAL
+    ,SUM(SAL) AS SUM
+FROM EMP;
+-- ALL SAL과 SAL의 차이가 있을까?
+
+-- 아래처럼 최대값 최소값은 각 칼럼의 편차를 알기에도 적합합니다.
+SELECT MAX(SAL) AS MAX_SAL-- SAL 칼럼 중에 최대값
+    ,MIN(SAL)   AS MIN_SAL-- SAL 칼럼 중에 최소값
+    ,ROUND(MAX(SAL) / MIN(SAL) , 2) AS MAX_MIN_TIMES
+FROM EMP
+WHERE DEPTNO = 10;
+-- (13) =================================================
+-- COUNT 집계함수
+SELECT COUNT(*)
+FROM EMP;
+SELECT COUNT(*)
+FROM EMP
+WHERE deptno = 30;
+SELECT COUNT(empno) -- null은 계산에 들어가지 않는다.
+    ,COUNT(comm)    -- 0도 당연히 센다. null만 안들어가는 것임.
+FROM EMP;
+SELECT count(DISTINCT sal)
+    ,count(ALL sal)
+    ,count(sal)
+FROM emp;
+SELECT count(ename)
+FROM EMP
+WHERE comm IS NOT NULL;
+SELECT count(ename)
+FROM EMP
+WHERE nvl(comm,0) > 0;
+SELECT avg(sal), '10' AS dno
+FROM EMP
+WHERE DEPTNO = 30;
+
+
+-- cf.후보키 / super 키
+-- 하나의 키만으로는 집단이 설명이 안되어서 2개 혹은 3개까지 주키를 만드는 칼럼도 생긴다.
+-- 이들을 조합해서 만드는 것을 super키이다.
+
+-- (14) =================================================
+-- JOIN
+
+-- 잘못된 JOIN
+SELECT *
+FROM EMP, DEPT -- 잘못된 join 사용 : cartesian product
+ORDER BY empno;
+SELECT *
+FROM EMP E, DEPT D -- 잘못된 join 사용 : cartesian product
+WHERE E.ENAME = 'SMITH'
+ORDER BY E.EMPNO;
+-- 정확한 JOIN : 교집합 칼럼 연결 (INNER JOIN)
+SELECT *
+FROM emp, dept
+WHERE emp.DEPTNO = dept.DEPTNO
+ORDER BY EMPNO;
+-- 아래는 위와 동일한 결과를 출력합니다.
+SELECT *
+FROM EMP E JOIN DEPT D
+ON(E.DEPTNO = D.DEPTNO) -- ON 키워드 뒤에 값을 비교하지.
+ORDER BY EMPNO;
+-- OUTER JOIN
+SELECT *
+FROM EMP E LEFT OUTER JOIN DEPT D
+ON(E.DEPTNO = D.DEPTNO)     -- ON 키워드 뒤에 값을 비교하자.
+ORDER BY EMPNO;
+
+--USING 구문으로도 ON 대신 간단하게 JOIN의 제약조건을 쓸 수도 있습니다.
+--이 경우의 장점은 나중에 JAVA와 결합될 때 using 뒤에 변수를 넣어주면 되기 때문에 굉장히 간단하게 SQL을 쓸 수 있다는 장점이 있습니다.
+SELECT *
+FROM EMP e JOIN DEPT d
+USING(deptno); -- USING 키워드 하나만으로 동일 칼럼을 비교할 수가 있게 되버림.
+
+-- 쿼리문을 문자열로 사용 가능하다.
+var_deptno; -- 사용자로부터 입력받은 부서 번호
+var_sql = "   SELECT E.EMPNO
+        , e.HIREDATE
+        , d.DNAME
+        , e.JOB
+        , e.SAL
+      FROM emp E JOIN dept D
+        ON E.(var_deptno) = D.(var_deptno);  ";
+
+SELECT e.empno
+    ,e.ename
+    ,e.hiredate
+    ,to_char(e.hiredate, 'YYYY -MM : DD') AS STRINGDATE
+    ,d.deptno
+    ,d.LOC
+FROM emp e
+    ,dept d
+WHERE e.deptno = d.deptno
+ORDER BY d.deptno, e.empno;
+
+SELECT e.empno
+    ,e.ename
+    ,e.hiredate
+    ,to_char(e.hiredate, 'YYYY -MM : DD') AS STRINGDATE
+    ,d.deptno
+    ,d.LOC
+FROM emp e
+    ,dept d
+WHERE e.deptno = d.deptno AND e.sal <2000
+ORDER BY d.deptno, e.empno;
+
+SELECT d.DNAME AS DEPARTMENT
+    ,avg(e.sal) AS avg_sal
+    ,sum(e.sal) AS sum_sal
+    ,max(e.sal) AS max_sal
+    ,min(e.sal) AS min_sal
+FROM EMP e
+    ,DEPT d
+WHERE e.DEPTNO = d.DEPTNO AND e.SAL <2000
+GROUP BY d.DNAME;
+
+/*
+JOIN 함수로 SALGRADE 부여 후 GRADE로 그룹별 직원 수...
+ */
+
+SELECT s.grade
+    ,count(e.Ename) AS emp_cnt
+FROM emp e, salgrade s
+WHERE e.sal BETWEEN s.losal and s.hisal
+group by s.grade
+order by emp_cnt desc;
+
+/*
+SELECT
+FROM emp E, dept D ---내가 필요한 테이블
+WHERE E.deptno = D.deptno; --- FROM에 대한 제약 조건.
+-- WHERE 이 자체가 E와 D를 inner join하겠다는 뜻입니다.
+이를 통해 알 수 있듯, from에 테이블이 2개가 있으면 JOIN하겠다는 이야기고, 그렇다면 반드시 where절로 제약조건을 둬야지.
+ */
+
+SELECT *
+FROM emp E, dept D -- Where를 안 썼을 때...cross join과 같은 형태로 나옵니다...
+Order by E.empno;
+-- 따라서 반드시 위처럼 제약조건을 적어주세요.
+
+/*
+ SELF-JOIN : 자기 자신의 릴레이션을 이용해서 테이블 칼럼을 조작하세요.
+ 언제 쓰냐면, 아래의 사례처럼, 자체 조인하는 경우에는...
+ 내 사번(3332223) /최준혁 / 상사 사번(777777) /상사 최으뜸
+ 그러나 만약, 테이블에 상사의 이름이 없다면, 상사의 이름을 자동으로 붙여줘야하는데 
+ 이런 경우에는 테이블을 하나 더 가져와야하고 그래서 self-join을 해주는 것입니다. 
+ */
+SELECT e1.EMPNO AS EMP_NO
+     ,e1.ENAME AS EMP_NAME
+     ,e2.MGR AS MGR_NO
+     ,e2.ENAME AS MGR_NAME
+    FROM EMP e1, EMP e2 -- SELF JOIN을 하기 위해서는 이 처럼 같은 테이블을 2번 불러와줘야합니다.
+    WHERE e1.EMPNO = e2.MGR -- 직원의 사번이 다른 직원의 상사사번이라면? 즉, 나는 다른직원의 상사라는 이야기입니다.
+
