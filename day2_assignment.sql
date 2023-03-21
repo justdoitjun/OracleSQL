@@ -1,9 +1,9 @@
---Q2-1. 테이블 객체 - 외래 키 - 널(NULL)
---Q2-2. 문자열 예시 - 문자셋
+--Q2-1. 테이블 - 외래 키 - 널(NULL)
+--Q2-2. 문자열 - 문자셋
 --Q2-3. VARCHAR2 - CHAR
---Q2-4. 키 제약조건 - 기본키 - 외래키
---Q2-5. 무결성(Integrity) 제약조건 - 개체 무결성 - 참조 무결성
---Q2-6. PK- Unique + Not null + Index
+--Q2-4. 제약조건 - 기본키 - 외래키
+--Q2-5. 무결성(Integrity) - (개체) 무결성 - (참조) 무결성
+--Q2-6. Unique + Not null + Index
 --실습과제 1-1 (1)오라클 SQL
 SELECT D.DEPTNO 
       ,D.DNAME 
