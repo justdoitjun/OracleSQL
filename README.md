@@ -1,1 +1,2 @@
-# OracleSQL
+# OracleSQL  -- Summary라는 곳에 강의 노트를 모두 올리고 있습니다. Day 1, Day2 이렇게...
+
