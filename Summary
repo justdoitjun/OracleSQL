@@ -366,3 +366,294 @@ SELECT e1.EMPNO AS EMP_NO
     FROM EMP e1, EMP e2 -- SELF JOIN을 하기 위해서는 이 처럼 같은 테이블을 2번 불러와줘야합니다.
     WHERE e1.EMPNO = e2.MGR -- 직원의 사번이 다른 직원의 상사사번이라면? 즉, 나는 다른직원의 상사라는 이야기입니다.
 
+-- DAY 03 =================================================================================================================================
+INSERT INTO emp_temp2(empno, ename, job, mgr,hiredate,sal, comm,deptno)
+VALUES(9999, 'hong', 'president', null, to_date('2001/01/01', 'YYYY/MM/DD'), 6000, 500, 10);
+INSERT INTO emp_temp2(empno, ename, job, mgr,hiredate,sal, comm,deptno)
+VALUES(2111, 'lee', 'manager', 9999, to_date('07/01/2000', 'MM/DD/YYYY'), 6000, 500, 10);
+INSERT INTO emp_temp2(empno, ename, job, mgr,hiredate,sal, comm,deptno)
+VALUES(2111, 'lee', 'manager', 9999, to_date('07/01/2000', 'DD/MM/YYYY'), 6000, 500, 10);
+INSERT INTO emp_temp2(empno, ename, job, mgr,hiredate,sal, comm,deptno)
+VALUES(3111, 'choi', 'manager', 9999, SYSDATE, 9000, 500, 10);
+SELECT * from emp_temp2;
+
+SELECT e.empno
+     , e.ename
+     , e.job
+     , e.mgr
+     , e.hiredate
+     , e.sal
+     , e.comm
+     , e.deptno
+     , s.grade
+FROM EMP e, SALGRADE s
+WHERE e.sal BETWEEN s.losal AND s.HISAL
+AND s.grade =1 ;
+
+SELECT *
+FROM emp_temp2;
+
+/*
+ UPDATE 문 : 필터된 데이터에 대해서 레코드 값을 수정한다.
+ 이유 불문하고, update set where가 통으로 필요함. (Where 가 꼭 필요함)
+ */
+ CREATE TABLE dept_temp3
+AS (SELECT * FROM dept);
+
+SELECT * FROM dept_temp3;
+
+UPDATE dept_temp3
+SET loc = 'BOSTON'
+WHERE deptno = 40;
+
+rollback;
+
+ UPDATE dept_temp3
+ SET dname = 'DATABASE'
+    , loc = 'SEOUL'
+WHERE deptno = 40;
+/*
+서브쿼리문을 사용하여 UPDATE
+ */
+UPDATE dept_temp3
+set (DNAME, LOC) = (SELECT dname,LOC
+                    FROM dept
+                    WHERE deptno = 40
+                    )
+
+WHERE deptno = 20; -- 이 경우에는 튜플이기 때문에 rollback이 안된다.
+
+WHERE deptno = 40;
+/*
+DELETE 구문으로 테이블에서 값을 제거
+    보통의 경우, DELETE 보다는 UPDATE 구문으로 상태 값을 변경합니다.
+    예시 : 근무/휴직/퇴사 등의 유형으로 값을 변경
+DELETE는 가능하면 거의 안 쓴다....
+    반드시, where 조건이 필요하다. UPDATE랑 똑같이 DELETE도 반드시 WHERE 조건이 필요하다.
+ */
+SELECT *
+FROM emp_temp3;
+
+
+CREATE table emp_temp3
+AS (SELECT * FROM emp);
+
+DELETE FROM emp_temp3
+WHERE job = 'MANAGER';
+
+ROLLBACK ;
+COMMIT ;
+
+DELETE FROM emp_temp3
+WHERE empno IN(SELECT e.empno
+               FROM emp_temp3 e, salgrade s
+               WHERE e.sal BETWEEN s.losal AND s.hisal
+               AND s.grade = 3
+               AND deptno = 30);
+
+SELECT e.empno
+               FROM emp_temp3 e, salgrade s
+               WHERE e.sal BETWEEN s.losal AND s.hisal
+               AND s.grade = 3
+               AND deptno = 30;
+
+/*
+ CREATE Statement :
+ */
+
+ CREATE TABLE EMP_NEW
+ (
+    empno           number(4)
+    ,ename          varchar(10)
+    ,job            varchar(9)
+    ,hiredate       date
+    ,salgrade       number(7,2)
+    ,comm           number(7,2)
+    ,dpetno         number(2)
+ );
+
+SELECT *
+FROM emp_new
+WHERE rownum <= 10;
+
+ALTER TABLE emp_new
+ADD (hp varchar(20))
+;                           -- 칼럼을 추가해줄 수 있음.
+
+ALTER TABLE EMP_NEW
+RENAME COLUMN hp TO TEL_NO; -- 잘못된 칼럼명을 hp에서 tel_no으로 바꿔줄 수 있음.
+
+ALTER TABLE emp_new
+MODiFy empno number(5) ;
+
+ALTER TABLE EMP_NEW
+DROP COLUMN tel_no ;
+
+/*
+ SEQUENCE 일련번호를 생성하며 테이블 관리를 편리하게 하고자 함.
+ */
+ CREATE SEQUENCE ()
+INCREMENT BY 1
+START WITH  1
+MAXVALUE 999
+MINVALUE 1
+nocycle nocache ;  -- no cycle no cache의 뜻이 뭔가?
+-- SEQUENCE를 가져다 쓰는데, 이 번호를 1군데에서만 쓸 수 있는 게 아니라 다른 데에서도 쓸 수 있잖아요.
+
+/*
+ 제약조건 지정 : 테이블 생성 시, 테이블 칼럼 별 제약조건을 설정..
+ Not null / Unique / PK / FK
+ */
+
+CREATE TABLE login
+(
+    log_id  VARCHAR2(20) NOT NULL
+    , log_pwd VARCHAR2(20) NOT NULL
+    , tel     VARCHAR2(20)
+);
+INSERT INTO login(log_id, log_pwd)
+VALUES ('test01', '1234');
+
+SELECT *
+FROM login;
+
+ALTER TABLE login
+MODIFY tel NOT NULL ;
+/*
+ TEL없는 고객이 발견되어, 수소문 끝에 어렵게 전화번호를 구함.
+ */
+ UPDATE login
+SET tel = '010-1234-5678'
+WHERE log_id = 'test01';
+/*
+ 오라클 DBMS가 사용자를 위해 만들어 놓은 제약조건 설정값 테이블
+ */
+ SELECT owner
+    ,constraint_name
+    ,constraint_type
+    , table_name
+FROM USER_CONSTRAINTS
+Where table_name = 'login';
+
+ALTER TABLE login
+MODIFY (tel CONSTRAINT TEL_NN NOT NULL);
+
+ALTER TABLE login
+DROP CONSTRAINT SYS_C007040;
+
+/*
+ UNIQUE 키워드를 사용
+ */
+ CREATE TABLE log_unique
+(
+    log_id      varchar2(20) UNIQUE
+    ,log_pwd    varchar2(20) NOT NULL
+    ,tel        varchar2(20)
+ );
+SELECT *
+FROM USER_CONSTRAINTS
+WHERE table_name = 'log_unique' ;
+
+UPDATE log_unique
+SET log_id = 'test_id_new' -- 사용자가 id 변경을 요청
+WHERE log_id IS NULL;
+
+ALTER TABLE log_unique
+MODIFY (tel unique) ;
+
+/*
+ PK (Primary Key : 테이블을 설명하는 가장 중요한 키 )
+ 특징 : Not Null, Unique, Index
+ */
+ CREATE TABLE log_pk
+(
+   log_id Varchar2(20) PRIMARY KEY
+    , log_pwd varchar2(20) NOT NULL
+    , tel     varchar2(20) UNIQUE
+ );
+INSERT INTO TABLE log_pk (log_id, log_pwd, tel)
+VALUES ('id01', 'pk01', '1');
+
+INSERT INTO TABLE log_pk (log_id, log_pwd, tel)
+VALUES (NULL, 'pwd02', '2');
+
+SELECT *
+FROM emp_temp2;
+
+/*
+ 존재하지 않는 부서번호를 EMP_TEMP 테이블에 입력을 시도함.
+ */
+
+ INSERT INTO emp_temp2 (empno, ename, job, mgr, hiredate, sal, comm, deptno)
+VALUES (3333,'ghost', 'surprise', 9999, sysdate, 1200, NULL, 99);
+
+/*
+ INDEX : 빠른 검색을 위한 색인 지정
+
+ 장점 : 순식간에 원하는 값을 찾아 준다.
+ 단점 : 입력과 출력이 잦은 경우, 인덱스가 설정된 테이블의 속도가 저하된다. 계속 변경이 되면 그렇지.
+ */
+CREATE INDEX idx_emp_job
+ON emp(job);
+
+SELECT *
+FROM user_indexes
+WHERE TABLE_NAME IN ('EMP', 'DEPT');
+/*
+ View 생성 : TABLE을 편리하게 사용하기 위한 목적으로 생성하는 가상 테이블
+ */
+
+CREATE VIEW vw_emp AS (SELECT empno, ename, job, deptno
+FROM emp
+WHERE deptno = 10);
+-- 테이블은 새로 만든 테이블을 입력해서, 저장하려고 하는 거고...뷰는 지금 만들어서 그냥 한번 볼라고 하는 거
+-- 그냥 이거 결과만 보겠다. 조회목적임.
+
+SELECT *
+FROM vw_emp ;
+
+SELECT *
+FROM USER_VIEWS
+WHERE view_name = 'VW_EMP'; -- 테이블 명은 반드시 대문자로 표기. 소문자일지라도...
+
+
+/*
+ ROWNUM     사용 : 상위 N개를 출력하기 위해 사용함.
+ 컬럼에 ROWNUM 순번을 입력하여 사용할 수 있음.
+ */
+-- sal desc 순서와 무관하게 emp 테이블에서 가져오는 순서로 순번을 출력한다.
+SELECT ROWNUM, E.*
+FROM EMP E
+ORDER BY SAL DESC;
+ --SAL desc 순서에 따라 오름차순으로 rownum 순번을 출력.
+SELECT ROWNUM, A.*
+FROM (SELECT ROWNUM, E.*
+FROM EMP E
+ORDER BY SAL DESC) A;
+--
+SELECT rownum,
+       A.*
+FROM (SELECT *
+      FROM emp
+      ORDER BY sal DESC) A
+WHERE rownum <=5 ;
+
+/*
+ 오라클 DBMS에서 관리하는 테이블 리스트 출력
+ */
+SELECT *
+FROM dict
+WHERE table_name = 'USER_IN%'--Wild Card(와일드카드 ) : USER_IN이 앞에 포함된 모든 것들을 가져와
+;
+
+SELECT *
+FROM DBA_USERS
+WHERE USERNAME = 'SCOTT'; -- SCOTT의 모든 것 출력
+
+SELECT *
+FROM DBA_TABLES
+WHERE table_name LIKE 'EMP%'; -- EMP로 시작하는 테이블 모두 출력
+
+SELECT *
+FROM USER_INDEXES
+WHERE TABLE_OWNER = 'SCOTT'; -- scott의 모든 index출력
