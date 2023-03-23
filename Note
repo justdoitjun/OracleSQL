@@ -1,3 +1,7 @@
+-- 고객 요구사항
+-- 여러개의 지점을 관할하는 본부장은 각 지점별 휴가 사용률에 관심이 많다. 휴가 사용률이 너무 낮으면, KPI에 부정적인 영향을 미치기 때문이다.
+
+
 -- drop은 틀까지 날려버린다.
 -- group by 가 붙으면 그 group 안에서 경쟁한다.
 -- FROM -> Where -> Group by -> Having -> Select -> Order by
