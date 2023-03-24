@@ -156,6 +156,9 @@ EMP_USER
 CREATE TABLE EMP_IDX
 AS (SELECT * FROM EMP WHERE 1 <> 1) --동일한 구조만 따와서 테이블을 만듦
 ;
+CREATE TABLE EMP_IDX
+AS (SELECT * FROM EMP) -- 동일하 구조와 데이터깢 같이 가져와서 테이블을 만듬. 
+;
 
 CREATE INDEX EMP_EMPNO_IDX
 ON EMP_IDX(EMPNO)
